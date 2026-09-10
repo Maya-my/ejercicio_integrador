@@ -439,6 +439,16 @@
     margin-bottom:16px;
   }
 
+  .comparison-table-wrap{overflow-x:auto;}
+  .comparison-table-wrap table{min-width:760px;}
+  .comparison-table-wrap td:last-child{font-family:var(--sans); color:var(--ink-soft);}
+  .meaning{font-family:var(--sans)!important; color:var(--ink-soft)!important;}
+  .conclusion-list{margin:0; padding-left:20px;}
+  .conclusion-list li{margin:0 0 10px; color:var(--ink-soft);}
+  .variable-card{background:var(--sheet); border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px;}
+  .variable-card b{font-family:var(--mono); color:var(--accent-dark);}
+  .variable-card span{display:block; margin-top:4px; font-size:12.5px; color:var(--ink-soft);}
+  .status-note{margin-top:12px; font-size:12px; color:var(--ink-faint);}
   footer.pagefoot{
     margin-top:50px;
     padding-top:20px;
@@ -478,7 +488,7 @@
     <a class="navitem" href="#parte2"><span class="numeral">II</span>Aproximación de Taylor</a>
     <a class="navitem" href="#parte3"><span class="numeral">III</span>Sistemas de ecuaciones</a>
     <a class="navitem" href="#integracion"><span class="numeral">IV</span>Integración final</a>
-    <a class="navitem" href="#entrega"><span class="numeral">·</span>Entrega</a>
+    <a class="navitem" href="#conclusiones"><span class="numeral">·</span>Conclusiones</a>
     <div class="railtime">Duración total<br>1 h 30 min</div>
   </nav>
 
@@ -528,12 +538,6 @@
         <div class="insight" id="errorInsight"></div>
       </div>
 
-      <div class="card">
-        <h3>Lectura financiera</h3>
-        <p class="subnote">En 2 o 3 líneas: ¿cómo puede un error en ingresos o costos afectar una decisión financiera?</p>
-        <textarea id="reflexionP1" maxlength="500" placeholder="Escribe tu respuesta aquí..."></textarea>
-        <div class="charcount"><span id="countP1">0</span>/500</div>
-      </div>
     </section>
 
     <!-- ================= PARTE II ================= -->
@@ -656,33 +660,44 @@
     <!-- ================= INTEGRACION ================= -->
     <section class="ledger-page" id="integracion">
       <div class="partlabel"><span class="roman">Parte IV</span><span class="chip">10 min sugeridos</span></div>
-      <h2 class="parttitle">Integración final</h2>
-      <p class="intro-text">Este panel reúne automáticamente los números clave que calculaste en las tres partes anteriores, para que los uses al redactar tu conclusión.</p>
+      <h2 class="parttitle">Conclusiones y comparación de resultados</h2>
+      <p class="intro-text">Las conclusiones se generan automáticamente a partir de los resultados obtenidos en las Partes I, II y III, mostrando qué variables cambiaron, cuánto cambiaron y qué significa cada cambio en el contexto financiero.</p>
 
       <div class="summarygrid" id="summaryGrid"></div>
 
       <div class="card">
-        <h3>Pregunta de cierre</h3>
-        <p class="subnote">¿Puede un error pequeño en un dato financiero producir un cambio importante en el resultado final? Relaciona tu respuesta con los errores calculados, la aproximación de Taylor y el sistema mal condicionado (máximo 5 líneas).</p>
-        <textarea id="reflexionFinal" maxlength="700" placeholder="Escribe tu conclusión aquí..."></textarea>
-        <div class="charcount"><span id="countFinal">0</span>/700</div>
+        <h3>Comparación de resultados</h3>
+        <p class="subnote">La comparación se actualiza cuando modificas los datos o resuelves los sistemas. Δ representa la diferencia entre dos resultados comparables.</p>
+        <div class="comparison-table-wrap">
+          <table class="datatable">
+            <thead><tr><th>Variable / resultado</th><th>Escenario o método 1</th><th>Escenario o método 2</th><th>Comparación</th><th>Significado</th></tr></thead>
+            <tbody id="comparisonTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Conclusión automática del ejercicio</h3>
+        <div class="insight" id="conclusionMain"></div>
+        <div class="insight amber" id="conclusionRisk"></div>
+        <div class="insight" id="conclusionMethods"></div>
+      </div>
+
+      <div class="card">
+        <h3>Variables y su significado</h3>
+        <div class="summarygrid" id="variablesGrid"></div>
       </div>
     </section>
 
-    <!-- ================= ENTREGA ================= -->
-    <section class="ledger-page" id="entrega">
-      <div class="partlabel"><span class="roman">Entrega</span></div>
-      <h2 class="parttitle">Antes de terminar los 90 minutos</h2>
-      <p class="intro-text">Verifica que tu documento final incluya los siguientes puntos.</p>
-      <div class="progresspill" id="progressPill">0 / 5 completado</div>
+    <!-- ================= CONCLUSIONES ================= -->
+    <section class="ledger-page" id="conclusiones">
+      <div class="partlabel"><span class="roman">Cierre</span></div>
+      <h2 class="parttitle">Lectura global del ejercicio</h2>
+      <p class="intro-text">No hay campos de respuesta teórica: el cierre se construye directamente con los cálculos. Para completar el ejercicio, resuelve cada caso y utiliza los resultados generados para interpretar precisión, convergencia y sensibilidad.</p>
+
       <div class="card">
-        <ul class="checklist" id="checklist">
-          <li><input type="checkbox" id="chk1"><label for="chk1">Cálculos de error absoluto, relativo y porcentual</label></li>
-          <li><input type="checkbox" id="chk2"><label for="chk2">Taylor de orden 1, 2 y 3 para el dato solicitado</label></li>
-          <li><input type="checkbox" id="chk3"><label for="chk3">Solución del caso ideal con LU, Jacobi y Gauss-Seidel</label></li>
-          <li><input type="checkbox" id="chk4"><label for="chk4">Comparación breve del caso bajo estrés y del caso mal condicionado (antes/después de la perturbación)</label></li>
-          <li><input type="checkbox" id="chk5"><label for="chk5">Una conclusión final de máximo 5 líneas</label></li>
-        </ul>
+        <h3>¿Qué muestran los resultados?</h3>
+        <div id="globalConclusion"></div>
       </div>
 
       <footer class="pagefoot">
@@ -1050,22 +1065,22 @@ function renderSummary(){
     {
       label:"Mayor error relativo (Parte I)",
       val: state.p1max ? state.p1max.label : null,
-      sub: state.p1max ? "E% = "+fmt(state.p1max.pct,3)+"%" : "Completa la Parte I"
+      sub: state.p1max ? "E% = "+fmt(state.p1max.pct,3)+"% · mayor impacto de registro" : "Calcula los errores de la Parte I"
     },
     {
       label:"Mejor aproximación de Taylor",
       val: state.p2 ? "Orden 3" : null,
-      sub: state.p2 ? "Reduce el error en "+fmt(state.p2.reduction,2)+"% frente al orden 1" : "Completa la Parte II"
+      sub: state.p2 ? "Error reducido "+fmt(state.p2.reduction,2)+"% frente al orden 1" : "Ejecuta la aproximación de Taylor"
     },
     {
-      label:"Caso ideal (III.1)",
-      val: state.p3ideal ? "Jacobi "+state.p3ideal.jacIter+" it · Seidel "+state.p3ideal.seiIter+" it" : null,
-      sub: state.p3ideal ? "Ambos métodos convergen a la misma solución" : "Resuelve el caso 3.1"
+      label:"Convergencia en caso ideal",
+      val: state.p3ideal ? "Jacobi "+state.p3ideal.jacIter+" · Seidel "+state.p3ideal.seiIter : null,
+      sub: state.p3ideal ? "Iteraciones hasta tolerancia 10⁻⁶" : "Resuelve el caso ideal"
     },
     {
-      label:"Sensibilidad (III.3, mal condicionado)",
+      label:"Sensibilidad del caso mal condicionado",
       val: state.p3ill && state.p3ill.deltaMag!==null ? "Δx máx ≈ "+fmt(state.p3ill.deltaMag,2) : null,
-      sub: state.p3ill ? "det(A) ≈ "+fmt(state.p3ill.det,8) : "Resuelve el caso 3.3"
+      sub: state.p3ill ? "det(A) ≈ "+fmt(state.p3ill.det,8) : "Resuelve el caso mal condicionado"
     }
   ];
   grid.innerHTML = cards.map(c=>
@@ -1075,27 +1090,118 @@ function renderSummary(){
       (c.val?'<div class="sumsub">'+c.sub+'</div>':'')+
     '</div>'
   ).join("");
+
+  renderComparisons();
+  renderConclusions();
 }
 
-/* ======================= TEXTAREAS: CONTADOR ======================= */
-function wireCharCount(taId, countId){
-  const ta=document.getElementById(taId), c=document.getElementById(countId);
-  ta.addEventListener("input", ()=>{ c.textContent=ta.value.length; });
-}
+function renderComparisons(){
+  const tbody=document.getElementById("comparisonTbody");
+  if(!tbody) return;
+  const rows=[];
 
-/* ======================= CHECKLIST ======================= */
-function wireChecklist(){
-  const items=document.querySelectorAll("#checklist input[type=checkbox]");
-  function update(){
-    let n=0;
-    items.forEach(cb=>{
-      cb.closest("li").classList.toggle("checked", cb.checked);
-      if(cb.checked) n++;
+  if(state.p1max){
+    rows.push({
+      variable:"Error porcentual máximo",
+      a:state.p1max.label,
+      b:"Referencia vs registrado",
+      comp:"E% = "+fmt(state.p1max.pct,3)+"%",
+      meaning:"Indica qué dato financiero es el más sensible al error de registro."
     });
-    document.getElementById("progressPill").textContent=n+" / "+items.length+" completado";
+  } else {
+    rows.push({variable:"Error porcentual máximo",a:"—",b:"—",comp:"Pendiente",meaning:"Se obtiene al comparar referencia y registro."});
   }
-  items.forEach(cb=>cb.addEventListener("change", update));
-  update();
+
+  if(state.p2){
+    rows.push({
+      variable:"Aproximación C(t)",
+      a:"Taylor orden 1",
+      b:"Taylor orden 3",
+      comp:"Error −"+fmt(state.p2.reduction,2)+"%",
+      meaning:"El orden 3 incorpora más términos y representa mejor la curvatura de C(t)."
+    });
+  } else {
+    rows.push({variable:"Aproximación C(t)",a:"—",b:"—",comp:"Pendiente",meaning:"Se compara el error de los órdenes 1, 2 y 3."});
+  }
+
+  if(state.p3ideal){
+    rows.push({
+      variable:"Velocidad de convergencia",
+      a:"Jacobi: "+state.p3ideal.jacIter+" iter.",
+      b:"Gauss-Seidel: "+state.p3ideal.seiIter+" iter.",
+      comp:state.p3ideal.jacIter===state.p3ideal.seiIter?"Iguales":(state.p3ideal.jacIter>state.p3ideal.seiIter?"Seidel más rápido":"Jacobi más rápido"),
+      meaning:"La iteración mide cuántas actualizaciones necesita cada método para alcanzar la tolerancia."
+    });
+  } else {
+    rows.push({variable:"Velocidad de convergencia",a:"—",b:"—",comp:"Pendiente",meaning:"Compara las iteraciones de Jacobi y Gauss-Seidel."});
+  }
+
+  if(state.p3ill){
+    rows.push({
+      variable:"Sensibilidad de la solución",
+      a:"b original",
+      b:"b perturbado",
+      comp:"Δx máx ≈ "+fmt(state.p3ill.deltaMag,2),
+      meaning:"Mide cuánto cambia la distribución x cuando cambia ligeramente un dato de entrada."
+    });
+  } else {
+    rows.push({variable:"Sensibilidad de la solución",a:"—",b:"—",comp:"Pendiente",meaning:"Se obtiene perturbando el último término de b."});
+  }
+
+  tbody.innerHTML=rows.map(r=>
+    "<tr><td class='lbl'>"+r.variable+"</td><td>"+r.a+"</td><td>"+r.b+"</td><td>"+r.comp+"</td><td class='meaning'>"+r.meaning+"</td></tr>"
+  ).join("");
+}
+
+function renderConclusions(){
+  const main=document.getElementById("conclusionMain");
+  const risk=document.getElementById("conclusionRisk");
+  const methods=document.getElementById("conclusionMethods");
+  const global=document.getElementById("globalConclusion");
+  const vars=document.getElementById("variablesGrid");
+  if(!main) return;
+
+  const p1=state.p1max ? "<b>"+state.p1max.label+"</b> concentra el mayor error porcentual, con E% = <b>"+fmt(state.p1max.pct,3)+"%</b>." : "La Parte I todavía no tiene resultados calculados.";
+  const p2=state.p2 ? "En Taylor, el orden 3 es el más preciso y reduce el error frente al orden 1 en <b>"+fmt(state.p2.reduction,2)+"%</b>." : "La Parte II todavía no tiene resultados calculados.";
+  const p3=state.p3ideal ? "En el caso ideal, Jacobi y Gauss-Seidel llegan a la misma solución con "+state.p3ideal.jacIter+" y "+state.p3ideal.seiIter+" iteraciones, respectivamente." : "El caso ideal aún no fue resuelto.";
+
+  main.innerHTML='<span class="ico">→</span><span>'+p1+' '+p2+' '+p3+'</span>';
+
+  if(state.p3ill){
+    risk.innerHTML='<span class="ico">⚠</span><span>El caso mal condicionado muestra el mayor riesgo numérico: det(A) ≈ <b>'+fmt(state.p3ill.det,8)+'</b> y una perturbación pequeña en b provoca un cambio máximo de <b>'+fmt(state.p3ill.deltaMag,2)+'</b> en las variables de la solución. Esto significa que pequeñas variaciones o redondeos en los datos pueden producir grandes cambios en la distribución de recursos.</span>';
+  } else {
+    risk.innerHTML='<span class="ico">⚠</span><span>Resuelve el caso 3.3 para medir la sensibilidad de la solución ante una pequeña perturbación del vector b.</span>';
+  }
+
+  methods.innerHTML='<span class="ico">≡</span><span><b>Interpretación de los métodos:</b> Cramer sirve como referencia exacta para el sistema 3×3; LU obtiene la solución mediante factorización; Jacobi actualiza las variables usando el vector de la iteración anterior; Gauss-Seidel reutiliza inmediatamente los valores recién calculados. Por eso, la comparación de iteraciones permite evaluar eficiencia de convergencia.</span>';
+
+  if(vars){
+    const variableData=[
+      ["Eₐ","Error absoluto","Diferencia en las mismas unidades entre el valor de referencia y el registrado."],
+      ["Eᵣ","Error relativo","Error absoluto dividido entre el valor de referencia; permite comparar errores en proporción al tamaño del dato."],
+      ["E%","Error porcentual","Error relativo expresado en porcentaje."],
+      ["C(t)","Capital","Monto acumulado en el tiempo t bajo capitalización continua."],
+      ["t₀","Punto de expansión","Año alrededor del cual se construye la aproximación de Taylor."],
+      ["t","Instante evaluado","Año en el que se desea estimar el capital."],
+      ["A","Matriz del sistema","Coeficientes que relacionan las variables de distribución de recursos."],
+      ["b","Vector independiente","Resultados o requerimientos financieros que alimentan el sistema."],
+      ["x₁, x₂, x₃","Distribución de recursos","Montos destinados a operaciones, comercialización y tecnología."],
+      ["det(A)","Determinante","Indicador de singularidad; un valor cercano a cero advierte alta sensibilidad."],
+      ["Δx","Cambio en la solución","Diferencia entre las variables antes y después de una perturbación."],
+      ["‖Δx‖∞","Error/cambio máximo","Mayor cambio absoluto entre las componentes de un vector."]
+    ];
+    vars.innerHTML=variableData.map(v=>'<div class="variable-card"><b>'+v[0]+'</b> · '+v[1]+'<span>'+v[2]+'</span></div>').join("");
+  }
+
+  if(global){
+    global.innerHTML='<ul class="conclusion-list">'+
+      '<li>'+p1+'</li>'+
+      '<li>'+p2+'</li>'+
+      '<li>'+p3+'</li>'+
+      '<li>'+(state.p3ill ? "El mal condicionamiento evidencia que la precisión de los datos de entrada es crítica: una perturbación pequeña puede amplificarse en la solución." : "El caso mal condicionado permitirá comprobar cómo una perturbación pequeña puede amplificarse en la solución.")+'</li>'+
+      '<li>En conjunto, el ejercicio muestra que precisión, aproximación y estabilidad son aspectos distintos: un método puede converger correctamente y, aun así, trabajar sobre datos que vuelven sensible la decisión financiera.</li>'+
+    '</ul>';
+  }
 }
 
 /* ======================= CRONÓMETRO 90 MIN ======================= */
@@ -1107,7 +1213,7 @@ function wireTimer(){
   const segs=Array.from(document.querySelectorAll(".seg"));
   const cum=[]; let acc=0;
   segs.forEach(s=>{ acc+=parseInt(s.dataset.min,10); cum.push(acc); });
-  const names=["Parte I · Teoría de errores","Parte II · Taylor","Parte III · Sistemas de ecuaciones","Parte IV · Integración y entrega"];
+  const names=["Parte I · Teoría de errores","Parte II · Taylor","Parte III · Sistemas de ecuaciones","Parte IV · Conclusiones"];
 
   function render(){
     const elapsedMin=(TOTAL-remaining)/60;
@@ -1164,9 +1270,6 @@ document.addEventListener("DOMContentLoaded", function(){
   renderCaso2();
   renderCaso3();
   renderSummary();
-  wireCharCount("reflexionP1","countP1");
-  wireCharCount("reflexionFinal","countFinal");
-  wireChecklist();
   wireTimer();
   wireNav();
 });
