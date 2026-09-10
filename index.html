@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafío integrador · Métodos numéricos en finanzas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Spectral:ital@1&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDEAE0;
+    --sheet:#FFFFFF;
+    --sheet-alt:#F7F5EE;
+    --ink:#1C2B39;
+    --ink-soft:#57626D;
+    --ink-faint:#8B93A0;
+    --line:#D9D3C1;
+    --line-strong:#BFB8A2;
+    --accent:#0F6B57;
+    --accent-dark:#0A4E3F;
+    --accent-soft:#DDEAE4;
+    --amber:#A9660D;
+    --amber-soft:#F3E4CB;
+    --red:#A03A2C;
+    --red-soft:#F3DFD9;
+    --serif:'Spectral', Georgia, serif;
+    --mono:'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+    --sans:'Inter', -apple-system, Segoe UI, sans-serif;
+    --radius:3px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      repeating-linear-gradient(0deg, rgba(28,43,57,0.028) 0px, rgba(28,43,57,0.028) 1px, transparent 1px, transparent 28px),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent-soft); color:var(--accent-dark);}
+  a{color:var(--accent-dark);}
+
+  .app{
+    display:grid;
+    grid-template-columns:220px 1fr;
+    max-width:1280px;
+    margin:0 auto;
+  }
+  /* ---------- NAV RAIL ---------- */
+  .railnav{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    padding:28px 14px 28px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .railnav .brandmark{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:0.01em;
+    color:var(--ink);
+    margin-bottom:22px;
+    padding-left:10px;
+  }
+  .railnav .brandmark em{
+    display:block;
+    font-style:italic;
+    font-weight:400;
+    font-size:11px;
+    color:var(--ink-faint);
+    margin-top:2px;
+  }
+  .navitem{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    padding:9px 10px;
+    border-radius:var(--radius);
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:13.5px;
+    border-left:2px solid transparent;
+  }
+  .navitem .numeral{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-faint);
+    width:16px;
+  }
+  .navitem:hover{background:rgba(28,43,57,0.045);}
+  .navitem.active{
+    color:var(--ink);
+    font-weight:600;
+    border-left-color:var(--accent);
+    background:var(--accent-soft);
+  }
+  .navitem.active .numeral{color:var(--accent-dark);}
+  .railtime{
+    margin-top:auto;
+    padding:10px;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-faint);
+    border-top:1px solid var(--line);
+    padding-top:14px;
+  }
+
+  main{padding:36px 40px 80px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:6px 4px 30px;
+    border-bottom:1px solid var(--line-strong);
+    margin-bottom:34px;
+  }
+  .hero .kicker{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--accent-dark);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .hero .kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
+  .hero h1{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(28px,4vw,42px);
+    line-height:1.12;
+    margin:10px 0 6px;
+    max-width:15ch;
+  }
+  .hero .lede{
+    font-size:15.5px;
+    color:var(--ink-soft);
+    max-width:62ch;
+    margin:0 0 26px;
+  }
+  .hero .context{
+    font-size:14px;
+    color:var(--ink-soft);
+    max-width:70ch;
+    background:var(--sheet);
+    border:1px solid var(--line);
+    border-left:3px solid var(--accent);
+    padding:14px 18px;
+    border-radius:0 var(--radius) var(--radius) 0;
+    margin-bottom:28px;
+  }
+
+  /* timer */
+  .timer{
+    background:var(--sheet);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 20px 16px;
+  }
+  .timer-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .timer-label{font-size:11.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-faint); font-weight:600;}
+  .timer-clock{font-family:var(--mono); font-size:28px; font-weight:500; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .timer-clock .segname{display:block; font-family:var(--sans); font-size:11.5px; color:var(--accent-dark); font-weight:600; margin-top:2px;}
+  .timer-controls{display:flex; gap:8px;}
+  .tbtn{
+    font-family:var(--sans);
+    font-size:12.5px;
+    font-weight:600;
+    padding:7px 14px;
+    border-radius:var(--radius);
+    border:1px solid var(--line-strong);
+    background:var(--sheet);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .tbtn:hover{border-color:var(--accent);}
+  .tbtn.primary{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .tbtn.primary:hover{background:var(--accent-dark);}
+  .segments{display:flex; gap:3px; height:34px;}
+  .seg{
+    position:relative;
+    border-radius:2px;
+    background:var(--sheet-alt);
+    border:1px solid var(--line);
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .seg .fill{position:absolute; inset:0 auto 0 0; width:0%; background:var(--accent-soft);}
+  .seg.current{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset;}
+  .seg span{position:relative; font-family:var(--mono); font-size:11px; color:var(--ink-soft); z-index:1;}
+  .seg.done .fill{width:100% !important; background:var(--accent-soft);}
+  .seg.done span{color:var(--accent-dark);}
+
+  /* ---------- LEDGER PAGE (section) ---------- */
+  .ledger-page{
+    padding-top:56px;
+    margin-top:-20px;
+  }
+  .ledger-page:first-of-type{padding-top:0;}
+  .partlabel{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:6px;
+  }
+  .partlabel .roman{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:15px;
+    color:var(--accent-dark);
+  }
+  .partlabel .chip{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-faint);
+    border:1px solid var(--line);
+    padding:2px 8px;
+    border-radius:10px;
+  }
+  h2.parttitle{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:26px;
+    margin:2px 0 14px;
+  }
+  .intro-text{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    max-width:70ch;
+    margin-bottom:22px;
+  }
+  .card{
+    background:var(--sheet);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    margin-bottom:20px;
+  }
+  .card h3{
+    font-family:var(--serif);
+    font-size:17px;
+    font-weight:600;
+    margin:0 0 4px;
+  }
+  .card .subnote{font-size:13px; color:var(--ink-faint); margin:0 0 16px;}
+  .formula{
+    font-family:var(--mono);
+    font-size:14.5px;
+    background:var(--sheet-alt);
+    border:1px solid var(--line);
+    padding:12px 16px;
+    border-radius:var(--radius);
+    margin:10px 0 16px;
+    color:var(--ink);
+  }
+  .formula small{display:block; font-family:var(--sans); font-size:11.5px; color:var(--ink-faint); margin-top:4px;}
+
+  /* tables */
+  table.datatable{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  table.datatable th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    color:var(--ink-faint);
+    font-weight:600;
+    border-bottom:1px solid var(--line-strong);
+    padding:8px 10px;
+  }
+  table.datatable td{
+    padding:9px 10px;
+    border-bottom:1px solid var(--line);
+    font-family:var(--mono);
+    color:var(--ink);
+  }
+  table.datatable td.lbl{font-family:var(--sans); color:var(--ink-soft);}
+  table.datatable tr.highlight td{background:var(--amber-soft);}
+  table.datatable tr.highlight td.lbl{font-weight:600; color:var(--amber);}
+  table.datatable input[type=number]{
+    width:100%;
+    font-family:var(--mono);
+    font-size:13.5px;
+    border:1px solid transparent;
+    background:transparent;
+    border-bottom:1px dashed var(--line-strong);
+    padding:3px 2px;
+    color:var(--ink);
+  }
+  table.datatable input[type=number]:focus{outline:none; border-bottom-color:var(--accent); background:var(--accent-soft);}
+
+  .insight{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    background:var(--accent-soft);
+    border:1px solid #C3DBD1;
+    border-radius:var(--radius);
+    padding:12px 16px;
+    font-size:13.5px;
+    color:var(--accent-dark);
+    margin-top:14px;
+  }
+  .insight.amber{background:var(--amber-soft); border-color:#E4C592; color:var(--amber);}
+  .insight.red{background:var(--red-soft); border-color:#E3B7AC; color:var(--red);}
+  .insight .ico{font-family:var(--mono); font-size:13px; margin-top:1px;}
+  .insight b{font-weight:700;}
+  .insight.placeholder{background:var(--sheet-alt); border-color:var(--line); color:var(--ink-faint); font-style:italic;}
+
+  /* matrix grid */
+  .matrixwrap{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:16px;}
+  .matrix{display:grid; grid-template-columns:repeat(3,58px); gap:5px;}
+  .matrix input{
+    width:100%;
+    text-align:center;
+    font-family:var(--mono);
+    font-size:14px;
+    padding:8px 2px;
+    border:1px solid var(--line-strong);
+    border-radius:2px;
+    background:var(--sheet-alt);
+    color:var(--ink);
+  }
+  .matrix input:focus{outline:none; border-color:var(--accent); background:#fff;}
+  .matrix input:disabled{color:var(--ink-faint); background:var(--sheet-alt); cursor:not-allowed;}
+  .vecsep{font-family:var(--serif); font-style:italic; font-size:20px; color:var(--ink-faint); padding:0 2px;}
+  .vec{display:grid; grid-template-rows:repeat(3,1fr); gap:5px;}
+  .vec input{width:64px; text-align:center; font-family:var(--mono); font-size:14px; padding:8px 2px; border:1px solid var(--line-strong); border-radius:2px; background:var(--sheet-alt); color:var(--ink);}
+  .vec input:focus{outline:none; border-color:var(--accent); background:#fff;}
+  .matlabel{font-size:11px; color:var(--ink-faint); text-align:center; margin-bottom:4px; font-family:var(--sans);}
+
+  .btnrow{display:flex; gap:10px; flex-wrap:wrap; margin:6px 0 4px;}
+  .btn{
+    font-family:var(--sans);
+    font-size:13px;
+    font-weight:600;
+    padding:9px 16px;
+    border-radius:var(--radius);
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+  }
+  .btn:hover{background:var(--accent-dark); border-color:var(--accent-dark);}
+  .btn.ghost{background:transparent; color:var(--accent-dark);}
+  .btn.ghost:hover{background:var(--accent-soft);}
+
+  .resultblock{margin-top:18px; display:none;}
+  .resultblock.show{display:block;}
+  .methodgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:14px;}
+  .methodcard{border:1px solid var(--line); border-radius:var(--radius); padding:14px 16px; background:var(--sheet-alt);}
+  .methodcard h4{margin:0 0 8px; font-family:var(--sans); font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-faint); font-weight:700;}
+  .methodcard .xval{font-family:var(--mono); font-size:13.5px; line-height:1.7;}
+  .methodcard .meta{font-size:11.5px; color:var(--ink-faint); margin-top:8px; font-family:var(--sans);}
+  .methodcard .badge{display:inline-block; font-size:10.5px; padding:1px 7px; border-radius:8px; font-family:var(--sans); font-weight:600; margin-left:4px;}
+  .badge.ok{background:var(--accent-soft); color:var(--accent-dark);}
+  .badge.no{background:var(--red-soft); color:var(--red);}
+
+  .lumat{display:flex; gap:18px; margin-top:12px; flex-wrap:wrap;}
+  .lublock{font-family:var(--mono); font-size:12.5px;}
+  .lublock .mtitle{font-family:var(--sans); font-size:11px; color:var(--ink-faint); margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em;}
+  .lublock table{border-collapse:collapse;}
+  .lublock td{padding:3px 8px; text-align:right; border:1px solid var(--line);}
+
+  details.iterdetail{margin-top:10px;}
+  details.iterdetail summary{cursor:pointer; font-size:12.5px; color:var(--accent-dark); font-weight:600;}
+  .iterscroll{max-height:180px; overflow-y:auto; margin-top:8px; border:1px solid var(--line); border-radius:2px;}
+  table.itertable{width:100%; border-collapse:collapse; font-family:var(--mono); font-size:11.5px;}
+  table.itertable th{position:sticky; top:0; background:var(--sheet-alt); padding:5px 8px; border-bottom:1px solid var(--line-strong); font-family:var(--sans); font-weight:600; color:var(--ink-faint); text-align:right;}
+  table.itertable td{padding:4px 8px; text-align:right; border-bottom:1px solid var(--line);}
+
+  textarea{
+    width:100%;
+    font-family:var(--sans);
+    font-size:13.5px;
+    color:var(--ink);
+    border:1px solid var(--line-strong);
+    border-radius:var(--radius);
+    padding:12px 14px;
+    resize:vertical;
+    min-height:84px;
+    background:var(--sheet-alt);
+  }
+  textarea:focus{outline:none; border-color:var(--accent); background:#fff;}
+  .charcount{font-size:11px; color:var(--ink-faint); text-align:right; margin-top:4px; font-family:var(--mono);}
+
+  .summarygrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin-bottom:22px;}
+  .sumcard{background:var(--sheet); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; border-top:3px solid var(--accent);}
+  .sumcard.pending{border-top-color:var(--line-strong);}
+  .sumcard .sumlabel{font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-faint); font-weight:600; margin-bottom:6px;}
+  .sumcard .sumval{font-family:var(--mono); font-size:19px; color:var(--ink); font-weight:500;}
+  .sumcard .sumval.pending{font-size:13px; font-style:italic; color:var(--ink-faint); font-weight:400;}
+  .sumcard .sumsub{font-size:12px; color:var(--ink-soft); margin-top:4px;}
+
+  .checklist{list-style:none; padding:0; margin:0;}
+  .checklist li{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:12px 4px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .checklist input[type=checkbox]{
+    margin-top:3px;
+    width:16px;height:16px;
+    accent-color:var(--accent);
+    cursor:pointer;
+  }
+  .checklist label{cursor:pointer;}
+  .checklist li.checked label{color:var(--ink-faint); text-decoration:line-through;}
+  .progresspill{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:12px;
+    background:var(--accent-soft);
+    color:var(--accent-dark);
+    padding:4px 12px;
+    border-radius:12px;
+    margin-bottom:16px;
+  }
+
+  footer.pagefoot{
+    margin-top:50px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12px;
+    color:var(--ink-faint);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  @media (max-width:900px){
+    .app{grid-template-columns:1fr;}
+    .railnav{
+      position:sticky; top:0; height:auto; z-index:10;
+      flex-direction:row; overflow-x:auto;
+      background:var(--paper);
+      padding:12px 16px;
+      border-bottom:1px solid var(--line-strong);
+      gap:4px;
+    }
+    .railnav .brandmark, .railtime{display:none;}
+    .navitem{flex-shrink:0; border-left:none; border-bottom:2px solid transparent;}
+    .navitem.active{border-left:none; border-bottom-color:var(--accent);}
+    main{padding:26px 18px 60px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <nav class="railnav" id="railnav">
+    <div class="brandmark">Desafío integrador<em>Métodos numéricos · finanzas</em></div>
+    <a class="navitem" href="#inicio"><span class="numeral">·</span>Inicio</a>
+    <a class="navitem" href="#parte1"><span class="numeral">I</span>Teoría de errores</a>
+    <a class="navitem" href="#parte2"><span class="numeral">II</span>Aproximación de Taylor</a>
+    <a class="navitem" href="#parte3"><span class="numeral">III</span>Sistemas de ecuaciones</a>
+    <a class="navitem" href="#integracion"><span class="numeral">IV</span>Integración final</a>
+    <a class="navitem" href="#entrega"><span class="numeral">·</span>Entrega</a>
+    <div class="railtime">Duración total<br>1 h 30 min</div>
+  </nav>
+
+  <main>
+    <header class="hero" id="inicio">
+      <div class="kicker"><span class="dot"></span>DESAFÍO INTEGRADOR · ÁREA FINANCIERA</div>
+      <h1>Cuando un error pequeño mueve una decisión grande</h1>
+      <p class="lede">Un ejercicio de 90 minutos para aplicar teoría de errores, aproximación por Taylor y sistemas de ecuaciones lineales (LU, Jacobi, Gauss-Seidel) sobre un mismo problema financiero.</p>
+      <p class="context">Una pequeña empresa necesita analizar información financiera para decidir sobre sus ingresos, costos y distribución de recursos. Los datos provienen de registros y estimaciones que pueden contener errores de medición, redondeo o aproximación. A lo largo de las tres partes de esta página observarás cómo esos errores se propagan — y en la Parte IV vas a escribir la conclusión que los conecta.</p>
+
+      <div class="timer">
+        <div class="timer-top">
+          <div>
+            <div class="timer-label">Cronómetro del ejercicio</div>
+            <div class="timer-clock" id="clockDisplay">90:00<span class="segname" id="segName">Sin iniciar</span></div>
+          </div>
+          <div class="timer-controls">
+            <button class="tbtn primary" id="btnStart">Iniciar</button>
+            <button class="tbtn" id="btnPause">Pausar</button>
+            <button class="tbtn" id="btnReset">Reiniciar</button>
+          </div>
+        </div>
+        <div class="segments" id="segments">
+          <div class="seg" data-min="20" style="flex:20;"><div class="fill"></div><span>I · 20 min</span></div>
+          <div class="seg" data-min="25" style="flex:25;"><div class="fill"></div><span>II · 25 min</span></div>
+          <div class="seg" data-min="35" style="flex:35;"><div class="fill"></div><span>III · 35 min</span></div>
+          <div class="seg" data-min="10" style="flex:10;"><div class="fill"></div><span>IV · 10 min</span></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ================= PARTE I ================= -->
+    <section class="ledger-page" id="parte1">
+      <div class="partlabel"><span class="roman">Parte I</span><span class="chip">20 min sugeridos</span></div>
+      <h2 class="parttitle">Teoría de errores</h2>
+      <p class="intro-text">La empresa compara sus valores financieros de referencia contra los valores efectivamente registrados. Edita las celdas si quieres probar otros montos — el error absoluto, relativo y porcentual se recalculan al instante.</p>
+
+      <div class="card">
+        <h3>Comparación de datos financieros</h3>
+        <p class="subnote">Eₐ = |x_real − x_aproximado|  ·  Eᵣ = Eₐ / |x_real|  ·  E% = Eᵣ × 100</p>
+        <table class="datatable" id="errorTable">
+          <thead>
+            <tr><th>Dato financiero</th><th>Valor de referencia (Bs)</th><th>Valor registrado (Bs)</th><th>Error absoluto</th><th>Error relativo</th><th>Error %</th></tr>
+          </thead>
+          <tbody id="errorTbody"><!-- filled by JS --></tbody>
+        </table>
+        <div class="insight" id="errorInsight"></div>
+      </div>
+
+      <div class="card">
+        <h3>Lectura financiera</h3>
+        <p class="subnote">En 2 o 3 líneas: ¿cómo puede un error en ingresos o costos afectar una decisión financiera?</p>
+        <textarea id="reflexionP1" maxlength="500" placeholder="Escribe tu respuesta aquí..."></textarea>
+        <div class="charcount"><span id="countP1">0</span>/500</div>
+      </div>
+    </section>
+
+    <!-- ================= PARTE II ================= -->
+    <section class="ledger-page" id="parte2">
+      <div class="partlabel"><span class="roman">Parte II</span><span class="chip">25 min sugeridos</span></div>
+      <h2 class="parttitle">Aproximación mediante Taylor</h2>
+      <p class="intro-text">Se desea aproximar el crecimiento de un capital con interés continuo. Ajusta el punto de expansión t₀ y el instante t para explorar cómo cambia la calidad de cada orden de aproximación.</p>
+
+      <div class="card">
+        <h3>Modelo de capitalización continua</h3>
+        <div class="formula">C(t) = 10 000 · e^(0.05t)
+<small>C'(t) = 500 e^(0.05t)  ·  C''(t) = 25 e^(0.05t)  ·  C'''(t) = 1.25 e^(0.05t)</small></div>
+
+        <div class="btnrow" style="align-items:center;">
+          <label style="font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:6px;">t₀ (años) <input type="number" id="taylorT0" value="1" step="0.1" style="width:70px; font-family:var(--mono); padding:5px 6px; border:1px solid var(--line-strong); border-radius:3px;"></label>
+          <label style="font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:6px;">t (años) <input type="number" id="taylorT" value="1.5" step="0.1" style="width:70px; font-family:var(--mono); padding:5px 6px; border:1px solid var(--line-strong); border-radius:3px;"></label>
+        </div>
+
+        <table class="datatable" style="margin-top:10px;">
+          <thead><tr><th>Aproximación</th><th>C(t) estimado (Bs)</th><th>Error absoluto</th></tr></thead>
+          <tbody id="taylorTbody"></tbody>
+        </table>
+        <div class="insight" id="taylorInsight"></div>
+      </div>
+    </section>
+
+    <!-- ================= PARTE III ================= -->
+    <section class="ledger-page" id="parte3">
+      <div class="partlabel"><span class="roman">Parte III</span><span class="chip">35 min sugeridos</span></div>
+      <h2 class="parttitle">Sistemas de ecuaciones lineales</h2>
+      <p class="intro-text">La empresa distribuye recursos entre tres áreas: x₁ operaciones, x₂ comercialización, x₃ tecnología (montos en miles de bolivianos). Vector inicial x⁽⁰⁾=(0,0,0), tolerancia 10⁻⁶, máximo 50 iteraciones.</p>
+
+      <!-- 3.1 caso ideal -->
+      <div class="card">
+        <h3>3.1 · Caso ideal</h3>
+        <p class="subnote">Resuelve el mismo sistema por solución exacta (Cramer), factorización LU, Jacobi y Gauss-Seidel.</p>
+
+        <div class="matrixwrap">
+          <div>
+            <div class="matlabel">Matriz A</div>
+            <div class="matrix" id="A1"></div>
+          </div>
+          <div class="vecsep">·x =</div>
+          <div>
+            <div class="matlabel">Vector b</div>
+            <div class="vec" id="b1"></div>
+          </div>
+        </div>
+        <div class="btnrow"><button class="btn" id="solve1">Resolver los 4 métodos</button></div>
+
+        <div class="resultblock" id="result1">
+          <div class="methodgrid" id="methodgrid1"></div>
+          <div class="lumat" id="lu1"></div>
+          <details class="iterdetail"><summary>Ver historial de iteraciones (Jacobi y Gauss-Seidel)</summary>
+            <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:8px;">
+              <div style="flex:1; min-width:260px;"><div class="matlabel">Jacobi</div><div class="iterscroll"><table class="itertable" id="iterJ1"></table></div></div>
+              <div style="flex:1; min-width:260px;"><div class="matlabel">Gauss-Seidel</div><div class="iterscroll"><table class="itertable" id="iterS1"></table></div></div>
+            </div>
+          </details>
+          <div class="insight" id="insight1"></div>
+        </div>
+      </div>
+
+      <!-- 3.2 caso bajo estres -->
+      <div class="card">
+        <h3>3.2 · Caso bajo estrés</h3>
+        <p class="subnote">Misma matriz A del caso ideal; el vector de resultados cambia por una variación inesperada en costos.</p>
+
+        <div class="matrixwrap">
+          <div>
+            <div class="matlabel">Matriz A (igual al caso ideal)</div>
+            <div class="matrix" id="A2"></div>
+          </div>
+          <div class="vecsep">·x =</div>
+          <div>
+            <div class="matlabel">Vector b (estrés)</div>
+            <div class="vec" id="b2"></div>
+          </div>
+        </div>
+        <div class="btnrow"><button class="btn" id="solve2">Resolver con Jacobi y Gauss-Seidel</button></div>
+
+        <div class="resultblock" id="result2">
+          <div class="methodgrid" id="methodgrid2"></div>
+          <div class="insight" id="insight2"></div>
+        </div>
+      </div>
+
+      <!-- 3.3 mal condicionado -->
+      <div class="card">
+        <h3>3.3 · Caso mal condicionado</h3>
+        <p class="subnote">Tres estimaciones financieras muy parecidas entre sí: el sistema puede ser muy sensible a pequeñas variaciones. Resuelve por LU, cambia el último término independiente y vuelve a resolver.</p>
+
+        <div class="matrixwrap">
+          <div>
+            <div class="matlabel">Matriz A</div>
+            <div class="matrix" id="A3"></div>
+          </div>
+          <div class="vecsep">·x =</div>
+          <div>
+            <div class="matlabel">Vector b original</div>
+            <div class="vec" id="b3"></div>
+          </div>
+          <div class="vecsep">→</div>
+          <div>
+            <div class="matlabel">Vector b perturbado</div>
+            <div class="vec" id="b3p"></div>
+          </div>
+        </div>
+        <div class="btnrow">
+          <button class="btn" id="solve3">Resolver por LU (original y perturbado)</button>
+        </div>
+
+        <div class="resultblock" id="result3">
+          <div class="methodgrid" id="methodgrid3"></div>
+          <div class="insight red" id="insight3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INTEGRACION ================= -->
+    <section class="ledger-page" id="integracion">
+      <div class="partlabel"><span class="roman">Parte IV</span><span class="chip">10 min sugeridos</span></div>
+      <h2 class="parttitle">Integración final</h2>
+      <p class="intro-text">Este panel reúne automáticamente los números clave que calculaste en las tres partes anteriores, para que los uses al redactar tu conclusión.</p>
+
+      <div class="summarygrid" id="summaryGrid"></div>
+
+      <div class="card">
+        <h3>Pregunta de cierre</h3>
+        <p class="subnote">¿Puede un error pequeño en un dato financiero producir un cambio importante en el resultado final? Relaciona tu respuesta con los errores calculados, la aproximación de Taylor y el sistema mal condicionado (máximo 5 líneas).</p>
+        <textarea id="reflexionFinal" maxlength="700" placeholder="Escribe tu conclusión aquí..."></textarea>
+        <div class="charcount"><span id="countFinal">0</span>/700</div>
+      </div>
+    </section>
+
+    <!-- ================= ENTREGA ================= -->
+    <section class="ledger-page" id="entrega">
+      <div class="partlabel"><span class="roman">Entrega</span></div>
+      <h2 class="parttitle">Antes de terminar los 90 minutos</h2>
+      <p class="intro-text">Verifica que tu documento final incluya los siguientes puntos.</p>
+      <div class="progresspill" id="progressPill">0 / 5 completado</div>
+      <div class="card">
+        <ul class="checklist" id="checklist">
+          <li><input type="checkbox" id="chk1"><label for="chk1">Cálculos de error absoluto, relativo y porcentual</label></li>
+          <li><input type="checkbox" id="chk2"><label for="chk2">Taylor de orden 1, 2 y 3 para el dato solicitado</label></li>
+          <li><input type="checkbox" id="chk3"><label for="chk3">Solución del caso ideal con LU, Jacobi y Gauss-Seidel</label></li>
+          <li><input type="checkbox" id="chk4"><label for="chk4">Comparación breve del caso bajo estrés y del caso mal condicionado (antes/después de la perturbación)</label></li>
+          <li><input type="checkbox" id="chk5"><label for="chk5">Una conclusión final de máximo 5 líneas</label></li>
+        </ul>
+      </div>
+
+      <footer class="pagefoot">
+        <span>Desafío integrador · Métodos numéricos aplicados al área financiera</span>
+        <span>Tolerancia iterativa 10⁻⁶ · x⁽⁰⁾=(0,0,0) · máx. 50 iteraciones</span>
+      </footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ======================= NÚCLEO NUMÉRICO ======================= */
+function vecSub(a,b){return a.map((x,i)=>x-b[i]);}
+function normInf(v){return Math.max(...v.map(x=>Math.abs(x)));}
+function fmt(n,d){ if(n===null||n===undefined||Number.isNaN(n)) return "—"; return Number(n).toFixed(d===undefined?4:d); }
+
+function det3(A){
+  return A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1])
+       - A[0][1]*(A[1][0]*A[2][2]-A[1][2]*A[2][0])
+       + A[0][2]*(A[1][0]*A[2][1]-A[1][1]*A[2][0]);
+}
+function solveCramer(A,b){
+  const D = det3(A);
+  if (Math.abs(D) < 1e-12) return {x:null, det:D};
+  const x = [0,1,2].map(col=>{
+    const Ai = A.map(row=>row.slice());
+    for(let r=0;r<3;r++) Ai[r][col]=b[r];
+    return det3(Ai)/D;
+  });
+  return {x, det:D};
+}
+function luDecompose(A){
+  const n=A.length;
+  const L=Array.from({length:n},()=>Array(n).fill(0));
+  const U=Array.from({length:n},()=>Array(n).fill(0));
+  for(let i=0;i<n;i++) L[i][i]=1;
+  for(let i=0;i<n;i++){
+    for(let j=i;j<n;j++){
+      let sum=0;
+      for(let k=0;k<i;k++) sum+=L[i][k]*U[k][j];
+      U[i][j]=A[i][j]-sum;
+    }
+    for(let j=i+1;j<n;j++){
+      let sum=0;
+      for(let k=0;k<i;k++) sum+=L[j][k]*U[k][i];
+      if (Math.abs(U[i][i])<1e-12) return null;
+      L[j][i]=(A[j][i]-sum)/U[i][i];
+    }
+  }
+  return {L,U};
+}
+function solveLU(A,b){
+  const lu=luDecompose(A);
+  if(!lu) return {x:null};
+  const {L,U}=lu;
+  const n=A.length;
+  const y=Array(n).fill(0);
+  for(let i=0;i<n;i++){
+    let sum=0;
+    for(let k=0;k<i;k++) sum+=L[i][k]*y[k];
+    y[i]=b[i]-sum;
+  }
+  const x=Array(n).fill(0);
+  for(let i=n-1;i>=0;i--){
+    let sum=0;
+    for(let k=i+1;k<n;k++) sum+=U[i][k]*x[k];
+    x[i]=(y[i]-sum)/U[i][i];
+  }
+  return {L,U,x};
+}
+function isDiagDominant(A){
+  return A.every((row,i)=>{
+    const diag=Math.abs(row[i]);
+    const rest=row.reduce((s,v,j)=>j===i?s:s+Math.abs(v),0);
+    return diag>=rest;
+  });
+}
+function jacobi(A,b,tol,maxIter){
+  const n=A.length;
+  let x=Array(n).fill(0);
+  const history=[{iter:0,x:x.slice(),err:null}];
+  let converged=false, iter=0;
+  for(iter=1; iter<=maxIter; iter++){
+    const xNew=Array(n).fill(0);
+    for(let i=0;i<n;i++){
+      let sum=0;
+      for(let j=0;j<n;j++) if(j!==i) sum+=A[i][j]*x[j];
+      xNew[i]=(b[i]-sum)/A[i][i];
+    }
+    const err=normInf(vecSub(xNew,x));
+    history.push({iter,x:xNew.slice(),err});
+    x=xNew;
+    if(err<tol){converged=true;break;}
+  }
+  return {x,iter:Math.min(iter,maxIter),converged,history};
+}
+function gaussSeidel(A,b,tol,maxIter){
+  const n=A.length;
+  let x=Array(n).fill(0);
+  const history=[{iter:0,x:x.slice(),err:null}];
+  let converged=false, iter=0;
+  for(iter=1; iter<=maxIter; iter++){
+    const xOld=x.slice();
+    for(let i=0;i<n;i++){
+      let sum=0;
+      for(let j=0;j<n;j++) if(j!==i) sum+=A[i][j]*x[j];
+      x[i]=(b[i]-sum)/A[i][i];
+    }
+    const err=normInf(vecSub(x,xOld));
+    history.push({iter,x:x.slice(),err});
+    if(err<tol){converged=true;break;}
+  }
+  return {x,iter:Math.min(iter,maxIter),converged,history};
+}
+
+const TOL=1e-6, MAXIT=50;
+
+/* ======================= HELPERS DE UI: MATRICES ======================= */
+function buildMatrix(containerId, values){
+  const el=document.getElementById(containerId);
+  el.innerHTML="";
+  for(let i=0;i<3;i++){
+    for(let j=0;j<3;j++){
+      const inp=document.createElement("input");
+      inp.type="number"; inp.step="any";
+      inp.value=values[i][j];
+      inp.id=containerId+"-"+i+"-"+j;
+      el.appendChild(inp);
+    }
+  }
+}
+function buildVector(containerId, values, {readonly=false}={}){
+  const el=document.getElementById(containerId);
+  el.innerHTML="";
+  for(let i=0;i<3;i++){
+    const inp=document.createElement("input");
+    inp.type="number"; inp.step="any";
+    inp.value=values[i];
+    inp.id=containerId+"-"+i;
+    if(readonly) inp.disabled=true;
+    el.appendChild(inp);
+  }
+}
+function readMatrix(containerId){
+  const A=[];
+  for(let i=0;i<3;i++){
+    const row=[];
+    for(let j=0;j<3;j++) row.push(parseFloat(document.getElementById(containerId+"-"+i+"-"+j).value)||0);
+    A.push(row);
+  }
+  return A;
+}
+function readVector(containerId){
+  const v=[];
+  for(let i=0;i<3;i++) v.push(parseFloat(document.getElementById(containerId+"-"+i).value)||0);
+  return v;
+}
+function xListHtml(x){
+  if(!x) return "<em>sin solución única</em>";
+  const labels=["x₁ (operaciones)","x₂ (comercialización)","x₃ (tecnología)"];
+  return labels.map((l,i)=>l+" = "+fmt(x[i],4)).join("<br>");
+}
+function iterRowsHtml(history){
+  let rows="<thead><tr><th>k</th><th>x₁</th><th>x₂</th><th>x₃</th><th>‖Δx‖∞</th></tr></thead><tbody>";
+  history.forEach(h=>{
+    rows+="<tr><td>"+h.iter+"</td><td>"+fmt(h.x[0],5)+"</td><td>"+fmt(h.x[1],5)+"</td><td>"+fmt(h.x[2],5)+"</td><td>"+(h.err===null?"—":fmt(h.err,7))+"</td></tr>";
+  });
+  return rows+"</tbody>";
+}
+
+/* estado compartido para el resumen de la Parte IV */
+const state={p1max:null, p3ideal:null, p3ill:null};
+
+/* ======================= PARTE I: ERRORES ======================= */
+const errData=[
+  {label:"Ingreso diario", ref:12500, reg:12420},
+  {label:"Costo operativo", ref:7800, reg:7860},
+  {label:"Utilidad estimada", ref:4700, reg:4560}
+];
+function renderErrorTable(){
+  const tbody=document.getElementById("errorTbody");
+  tbody.innerHTML="";
+  const rows=errData.map((d,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML =
+      '<td class="lbl">'+d.label+'</td>'+
+      '<td><input type="number" step="any" id="ref'+i+'" value="'+d.ref+'"></td>'+
+      '<td><input type="number" step="any" id="reg'+i+'" value="'+d.reg+'"></td>'+
+      '<td class="ea">—</td><td class="er">—</td><td class="ep">—</td>';
+    tbody.appendChild(tr);
+    return tr;
+  });
+  function recompute(){
+    let maxPct=-1, maxLabel="";
+    rows.forEach((tr,i)=>{
+      const ref=parseFloat(document.getElementById("ref"+i).value)||0;
+      const reg=parseFloat(document.getElementById("reg"+i).value)||0;
+      const ea=Math.abs(ref-reg);
+      const er= ref!==0 ? ea/Math.abs(ref) : 0;
+      const ep= er*100;
+      tr.querySelector(".ea").textContent=fmt(ea,2);
+      tr.querySelector(".er").textContent=fmt(er,5);
+      tr.querySelector(".ep").textContent=fmt(ep,3)+"%";
+      tr.classList.remove("highlight");
+      if(ep>maxPct){maxPct=ep; maxLabel=errData[i].label;}
+    });
+    rows.forEach((tr,i)=>{ if(errData[i].label===maxLabel) tr.classList.add("highlight"); });
+    document.getElementById("errorInsight").innerHTML =
+      '<span class="ico">→</span><span><b>'+maxLabel+'</b> presenta el mayor error porcentual (E% = '+fmt(maxPct,3)+'%). Es el dato que más distorsiona una decisión basada en estos registros.</span>';
+    state.p1max={label:maxLabel, pct:maxPct};
+    renderSummary();
+  }
+  tbody.querySelectorAll("input").forEach(inp=>inp.addEventListener("input", recompute));
+  recompute();
+}
+
+/* ======================= PARTE II: TAYLOR ======================= */
+function renderTaylor(){
+  const C0=10000, k=0.05;
+  const t0input=document.getElementById("taylorT0");
+  const tinput=document.getElementById("taylorT");
+  function recompute(){
+    const t0=parseFloat(t0input.value)||1;
+    const t=parseFloat(tinput.value)||1.5;
+    const dt=t-t0;
+    const Ct0=C0*Math.exp(k*t0);
+    const Cexact=C0*Math.exp(k*t);
+    const C1p=k*Ct0, C2p=k*k*Ct0, C3p=k*k*k*Ct0;
+    const T1=Ct0+C1p*dt;
+    const T2=T1+(C2p/2)*dt*dt;
+    const T3=T2+(C3p/6)*dt*dt*dt;
+    const rows=[
+      {name:"Valor exacto C(t)", val:Cexact, err:0},
+      {name:"Taylor orden 1", val:T1, err:Math.abs(Cexact-T1)},
+      {name:"Taylor orden 2", val:T2, err:Math.abs(Cexact-T2)},
+      {name:"Taylor orden 3", val:T3, err:Math.abs(Cexact-T3)}
+    ];
+    const tbody=document.getElementById("taylorTbody");
+    tbody.innerHTML=rows.map(r=>
+      '<tr><td class="lbl">'+r.name+'</td><td>'+fmt(r.val,4)+'</td><td>'+(r.name==="Valor exacto C(t)"?"—":fmt(r.err,4))+'</td></tr>'
+    ).join("");
+    const e1=rows[1].err, e3=rows[3].err;
+    const reduction = e1>0 ? (1-e3/e1)*100 : 0;
+    document.getElementById("taylorInsight").innerHTML =
+      '<span class="ico">→</span><span>El orden 3 fue el más preciso: redujo el error absoluto en un <b>'+fmt(reduction,2)+'%</b> respecto al orden 1 (de '+fmt(e1,4)+' a '+fmt(e3,4)+' Bs). Cada término adicional de la serie captura la curvatura que el orden anterior ignoraba.</span>';
+    state.p2={t0,t,T3,reduction};
+    renderSummary();
+  }
+  t0input.addEventListener("input", recompute);
+  tinput.addEventListener("input", recompute);
+  recompute();
+}
+
+/* ======================= PARTE III.1 CASO IDEAL ======================= */
+function renderCaso1(){
+  buildMatrix("A1", [[10,2,1],[1,9,2],[2,1,8]]);
+  buildVector("b1", [29,25,28]);
+  document.getElementById("solve1").addEventListener("click", ()=>{
+    const A=readMatrix("A1"), b=readVector("b1");
+    const cr=solveCramer(A,b);
+    const lu=solveLU(A,b);
+    const jac=jacobi(A,b,TOL,MAXIT);
+    const sei=gaussSeidel(A,b,TOL,MAXIT);
+    const dominant=isDiagDominant(A);
+
+    document.getElementById("methodgrid1").innerHTML = [
+      {name:"Solución exacta (Cramer)", body:xListHtml(cr.x), meta:"det(A) = "+fmt(cr.det,4)},
+      {name:"Factorización LU", body:xListHtml(lu.x), meta:lu.x?"Ly=b, Ux=y":"pivote nulo"},
+      {name:"Jacobi", body:xListHtml(jac.x), meta:jac.iter+" iteraciones "+(jac.converged?'<span class="badge ok">convergió</span>':'<span class="badge no">no convergió</span>')},
+      {name:"Gauss-Seidel", body:xListHtml(sei.x), meta:sei.iter+" iteraciones "+(sei.converged?'<span class="badge ok">convergió</span>':'<span class="badge no">no convergió</span>')}
+    ].map(m=>'<div class="methodcard"><h4>'+m.name+'</h4><div class="xval">'+m.body+'</div><div class="meta">'+m.meta+'</div></div>').join("");
+
+    document.getElementById("lu1").innerHTML =
+      '<div class="lublock"><div class="mtitle">Matriz L</div>'+luTableHtml(lu.L)+'</div>'+
+      '<div class="lublock"><div class="mtitle">Matriz U</div>'+luTableHtml(lu.U)+'</div>';
+
+    document.getElementById("iterJ1").innerHTML = iterRowsHtml(jac.history);
+    document.getElementById("iterS1").innerHTML = iterRowsHtml(sei.history);
+
+    const faster = jac.iter>sei.iter ? "Gauss-Seidel" : (sei.iter>jac.iter?"Jacobi":null);
+    const speedTxt = faster
+      ? '<b>'+faster+'</b> convergió más rápido ('+Math.min(jac.iter,sei.iter)+' vs '+Math.max(jac.iter,sei.iter)+' iteraciones) porque usa los valores recién actualizados dentro de la misma iteración.'
+      : "Ambos métodos convergieron en el mismo número de iteraciones.";
+    document.getElementById("insight1").innerHTML =
+      '<span class="ico">→</span><span>La matriz es diagonalmente dominante ('+(dominant?"sí":"no")+'), lo que '+(dominant?"garantiza":"no garantiza")+' la convergencia de Jacobi y Gauss-Seidel. '+speedTxt+' Los cuatro métodos coinciden en la solución hasta el redondeo.</span>';
+
+    document.getElementById("result1").classList.add("show");
+    state.p3ideal={x:cr.x, jacIter:jac.iter, seiIter:sei.iter};
+    renderSummary();
+  });
+}
+function luTableHtml(M){
+  if(!M) return "<em>no disponible</em>";
+  return "<table>"+M.map(row=>"<tr>"+row.map(v=>"<td>"+fmt(v,3)+"</td>").join("")+"</tr>").join("")+"</table>";
+}
+
+/* ======================= PARTE III.2 CASO BAJO ESTRES ======================= */
+function renderCaso2(){
+  buildMatrix("A2", [[10,2,1],[1,9,2],[2,1,8]]);
+  document.getElementById("A2").querySelectorAll("input").forEach(i=>i.disabled=true);
+  buildVector("b2", [29.5,24.5,28.4]);
+  document.getElementById("solve2").addEventListener("click", ()=>{
+    const A=readMatrix("A2"), b=readVector("b2");
+    const jac=jacobi(A,b,TOL,MAXIT);
+    const sei=gaussSeidel(A,b,TOL,MAXIT);
+
+    const idealX = state.p3ideal ? state.p3ideal.x : solveCramer(A,[29,25,28]).x;
+    const delta = idealX && sei.x ? vecSub(sei.x, idealX) : null;
+
+    document.getElementById("methodgrid2").innerHTML = [
+      {name:"Jacobi (estrés)", body:xListHtml(jac.x), meta:jac.iter+" iteraciones "+(jac.converged?'<span class="badge ok">convergió</span>':'<span class="badge no">no convergió</span>')},
+      {name:"Gauss-Seidel (estrés)", body:xListHtml(sei.x), meta:sei.iter+" iteraciones "+(sei.converged?'<span class="badge ok">convergió</span>':'<span class="badge no">no convergió</span>')}
+    ].map(m=>'<div class="methodcard"><h4>'+m.name+'</h4><div class="xval">'+m.body+'</div><div class="meta">'+m.meta+'</div></div>').join("");
+
+    const deltaTxt = delta
+      ? "Δx₁ = "+fmt(delta[0],4)+", Δx₂ = "+fmt(delta[1],4)+", Δx₃ = "+fmt(delta[2],4)
+      : "resuelve primero el caso ideal (3.1) para comparar";
+    document.getElementById("insight2").innerHTML =
+      '<span class="ico">→</span><span>Frente al caso ideal, la solución se desplaza poco: '+deltaTxt+'. El número de iteraciones ('+jac.iter+' Jacobi, '+sei.iter+' Gauss-Seidel) prácticamente no cambia: un sistema bien condicionado absorbe variaciones moderadas en b sin volverse inestable.</span>';
+
+    document.getElementById("result2").classList.add("show");
+  });
+}
+
+/* ======================= PARTE III.3 MAL CONDICIONADO ======================= */
+function renderCaso3(){
+  buildMatrix("A3", [[1,1,1],[1.001,1,1],[1,1.001,1]]);
+  buildVector("b3", [6,6.001,6.002]);
+  buildVector("b3p", [6,6.001,6.003]);
+  document.getElementById("solve3").addEventListener("click", ()=>{
+    const A=readMatrix("A3");
+    const b=readVector("b3");
+    const bp=readVector("b3p");
+    const lu1=solveLU(A,b);
+    const lu2=solveLU(A,bp);
+    const cr=solveCramer(A,b);
+    const delta = (lu1.x && lu2.x) ? vecSub(lu2.x, lu1.x) : null;
+
+    document.getElementById("methodgrid3").innerHTML = [
+      {name:"LU · b original", body:xListHtml(lu1.x), meta:"det(A) ≈ "+fmt(cr.det,8)},
+      {name:"LU · b perturbado", body:xListHtml(lu2.x), meta:"último término: "+bp[2]}
+    ].map(m=>'<div class="methodcard"><h4>'+m.name+'</h4><div class="xval">'+m.body+'</div><div class="meta">'+m.meta+'</div></div>').join("");
+
+    const deltaTxt = delta
+      ? "Δx₁ = "+fmt(delta[0],3)+", Δx₂ = "+fmt(delta[1],3)+", Δx₃ = "+fmt(delta[2],3)
+      : "no se pudo factorizar (pivote nulo)";
+    const deltaMag = delta ? normInf(delta) : null;
+    document.getElementById("insight3").innerHTML =
+      '<span class="ico">⚠</span><span>El determinante de A es casi cero (≈ '+fmt(cr.det,8)+'), señal de mal condicionamiento. Cambiar el último término independiente en apenas 0.001 produjo '+deltaTxt+' — un cambio de hasta <b>'+(deltaMag?fmt(deltaMag,2):"—")+'</b> unidades en la solución. Así, un redondeo insignificante en un dato financiero puede invertir por completo la distribución de recursos entre áreas.</span>';
+
+    document.getElementById("result3").classList.add("show");
+    state.p3ill={det:cr.det, deltaMag};
+    renderSummary();
+  });
+}
+
+/* ======================= PARTE IV: RESUMEN ======================= */
+function renderSummary(){
+  const grid=document.getElementById("summaryGrid");
+  const cards=[
+    {
+      label:"Mayor error relativo (Parte I)",
+      val: state.p1max ? state.p1max.label : null,
+      sub: state.p1max ? "E% = "+fmt(state.p1max.pct,3)+"%" : "Completa la Parte I"
+    },
+    {
+      label:"Mejor aproximación de Taylor",
+      val: state.p2 ? "Orden 3" : null,
+      sub: state.p2 ? "Reduce el error en "+fmt(state.p2.reduction,2)+"% frente al orden 1" : "Completa la Parte II"
+    },
+    {
+      label:"Caso ideal (III.1)",
+      val: state.p3ideal ? "Jacobi "+state.p3ideal.jacIter+" it · Seidel "+state.p3ideal.seiIter+" it" : null,
+      sub: state.p3ideal ? "Ambos métodos convergen a la misma solución" : "Resuelve el caso 3.1"
+    },
+    {
+      label:"Sensibilidad (III.3, mal condicionado)",
+      val: state.p3ill && state.p3ill.deltaMag!==null ? "Δx máx ≈ "+fmt(state.p3ill.deltaMag,2) : null,
+      sub: state.p3ill ? "det(A) ≈ "+fmt(state.p3ill.det,8) : "Resuelve el caso 3.3"
+    }
+  ];
+  grid.innerHTML = cards.map(c=>
+    '<div class="sumcard '+(c.val?'':'pending')+'">'+
+      '<div class="sumlabel">'+c.label+'</div>'+
+      '<div class="sumval'+(c.val?'':' pending')+'">'+(c.val?c.val:c.sub)+'</div>'+
+      (c.val?'<div class="sumsub">'+c.sub+'</div>':'')+
+    '</div>'
+  ).join("");
+}
+
+/* ======================= TEXTAREAS: CONTADOR ======================= */
+function wireCharCount(taId, countId){
+  const ta=document.getElementById(taId), c=document.getElementById(countId);
+  ta.addEventListener("input", ()=>{ c.textContent=ta.value.length; });
+}
+
+/* ======================= CHECKLIST ======================= */
+function wireChecklist(){
+  const items=document.querySelectorAll("#checklist input[type=checkbox]");
+  function update(){
+    let n=0;
+    items.forEach(cb=>{
+      cb.closest("li").classList.toggle("checked", cb.checked);
+      if(cb.checked) n++;
+    });
+    document.getElementById("progressPill").textContent=n+" / "+items.length+" completado";
+  }
+  items.forEach(cb=>cb.addEventListener("change", update));
+  update();
+}
+
+/* ======================= CRONÓMETRO 90 MIN ======================= */
+function wireTimer(){
+  const TOTAL=90*60;
+  let remaining=TOTAL, timerId=null;
+  const clockEl=document.getElementById("clockDisplay");
+  const segNameEl=document.getElementById("segName");
+  const segs=Array.from(document.querySelectorAll(".seg"));
+  const cum=[]; let acc=0;
+  segs.forEach(s=>{ acc+=parseInt(s.dataset.min,10); cum.push(acc); });
+  const names=["Parte I · Teoría de errores","Parte II · Taylor","Parte III · Sistemas de ecuaciones","Parte IV · Integración y entrega"];
+
+  function render(){
+    const elapsedMin=(TOTAL-remaining)/60;
+    const m=Math.floor(remaining/60), s=remaining%60;
+    let segIdx=cum.findIndex(c=>elapsedMin<c);
+    if(segIdx===-1) segIdx=cum.length-1;
+    clockEl.childNodes[0].nodeValue=(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+    segNameEl.textContent = remaining<=0 ? "Tiempo completado" : names[segIdx];
+    segs.forEach((seg,i)=>{
+      seg.classList.toggle("current", i===segIdx && remaining>0);
+      const segStart=i===0?0:cum[i-1], segTotalSec=(cum[i]-segStart)*60;
+      const segElapsed=Math.min(Math.max((TOTAL-remaining)-segStart*60,0), segTotalSec);
+      seg.querySelector(".fill").style.width=(segTotalSec>0 ? (segElapsed/segTotalSec*100) : 0)+"%";
+      seg.classList.toggle("done", segElapsed>=segTotalSec && segTotalSec>0);
+    });
+  }
+  document.getElementById("btnStart").addEventListener("click", ()=>{
+    if(timerId) return;
+    timerId=setInterval(()=>{
+      remaining=Math.max(0, remaining-1);
+      render();
+      if(remaining<=0){ clearInterval(timerId); timerId=null; }
+    },1000);
+  });
+  document.getElementById("btnPause").addEventListener("click", ()=>{
+    if(timerId){ clearInterval(timerId); timerId=null; }
+  });
+  document.getElementById("btnReset").addEventListener("click", ()=>{
+    if(timerId){ clearInterval(timerId); timerId=null; }
+    remaining=TOTAL; render();
+  });
+  render();
+}
+
+/* ======================= NAV ACTIVA (scroll spy) ======================= */
+function wireNav(){
+  const navItems=Array.from(document.querySelectorAll(".navitem"));
+  const sections=navItems.map(a=>document.querySelector(a.getAttribute("href")));
+  function onScroll(){
+    let idx=0;
+    const y=window.scrollY+120;
+    sections.forEach((sec,i)=>{ if(sec && sec.offsetTop<=y) idx=i; });
+    navItems.forEach((a,i)=>a.classList.toggle("active", i===idx));
+  }
+  window.addEventListener("scroll", onScroll, {passive:true});
+  onScroll();
+}
+
+/* ======================= INIT ======================= */
+document.addEventListener("DOMContentLoaded", function(){
+  renderErrorTable();
+  renderTaylor();
+  renderCaso1();
+  renderCaso2();
+  renderCaso3();
+  renderSummary();
+  wireCharCount("reflexionP1","countP1");
+  wireCharCount("reflexionFinal","countFinal");
+  wireChecklist();
+  wireTimer();
+  wireNav();
+});
+
+})();
+</script>
+</body>
+</html>
